@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Récapitulatif — Facturation Électronique Nationale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700;9..144,900&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy-900: #0a1628;
+    --navy-800: #112240;
+    --navy-700: #1a2f4e;
+    --navy-50:  #f4f6fb;
+    --paper:    #fafaf7;
+    --ink:      #1a1f2e;
+    --ink-soft: #4a5468;
+    --rule:     #d8dde6;
+    --gold:     #c8a55b;
+
+    --critical: #b91c1c;
+    --very-high:#dc2626;
+    --high:     #ea7c1c;
+    --medium:   #d4a017;
+
+    --green:    #15803d;
+    --amber:    #c2740a;
+    --red-x:    #991b1b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    padding: 32px 16px;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .doc {
+    max-width: 1280px;
+    margin: 0 auto;
+    background: #fff;
+    border: 1px solid var(--rule);
+    box-shadow: 0 1px 2px rgba(10,22,40,.04), 0 8px 32px rgba(10,22,40,.06);
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: linear-gradient(180deg, var(--navy-900) 0%, var(--navy-800) 100%);
+    color: #fff;
+    padding: 36px 40px 32px;
+    border-bottom: 3px solid var(--gold);
+    position: relative;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 4px;
+    background: var(--gold);
+  }
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .header h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 700;
+    font-size: clamp(24px, 3.2vw, 36px);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    margin-bottom: 10px;
+  }
+  .header .subtitle {
+    font-size: 14px;
+    color: rgba(255,255,255,.7);
+    max-width: 720px;
+  }
+  .header .meta {
+    display: flex;
+    gap: 28px;
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(255,255,255,.12);
+    font-size: 12px;
+    color: rgba(255,255,255,.6);
+    font-family: 'JetBrains Mono', monospace;
+    flex-wrap: wrap;
+  }
+  .header .meta span strong {
+    color: #fff;
+    font-weight: 600;
+    margin-left: 6px;
+  }
+
+  /* ===== TABLE ===== */
+  .table-wrap {
+    overflow-x: auto;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    min-width: 1100px;
+  }
+  thead th {
+    background: var(--navy-50);
+    color: var(--navy-900);
+    font-weight: 700;
+    text-align: left;
+    padding: 14px 16px;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--navy-800);
+    vertical-align: bottom;
+  }
+  thead th .th-sub {
+    display: block;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-top: 3px;
+    font-style: italic;
+  }
+  tbody tr {
+    border-bottom: 1px solid var(--rule);
+    transition: background .15s ease;
+  }
+  tbody tr:hover { background: #fbfbf8; }
+  tbody td {
+    padding: 14px 16px;
+    vertical-align: top;
+  }
+  .domain {
+    font-weight: 600;
+    color: var(--navy-900);
+    white-space: nowrap;
+  }
+  .domain .dom-num {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--ink-soft);
+    font-weight: 500;
+    margin-right: 8px;
+    font-size: 11px;
+  }
+  .requirement {
+    color: var(--ink-soft);
+    font-size: 12.5px;
+    max-width: 220px;
+  }
+  .comment {
+    color: var(--ink-soft);
+    font-size: 12px;
+    font-style: italic;
+    max-width: 240px;
+    line-height: 1.45;
+  }
+
+  /* Status cells */
+  .status {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 12.5px;
+    line-height: 1.4;
+  }
+  .status .icon {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 1px;
+  }
+  .status.yes .icon  { background: var(--green); }
+  .status.no .icon   { background: var(--red-x); }
+  .status.warn .icon { background: var(--amber); }
+  .status.yes  { color: #14532d; }
+  .status.no   { color: #7f1d1d; }
+  .status.warn { color: #78350f; }
+
+  /* Criticality badges */
+  .badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 2px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #fff;
+    font-family: 'JetBrains Mono', monospace;
+    white-space: nowrap;
+  }
+  .badge.critical  { background: var(--critical); }
+  .badge.very-high { background: var(--very-high); }
+  .badge.high      { background: var(--high); }
+  .badge.medium    { background: var(--medium); color: #3a2a05; }
+
+  /* Section divider rows */
+  .section-row td {
+    background: var(--navy-900);
+    color: var(--gold);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    padding: 8px 16px;
+    font-weight: 600;
+  }
+
+  /* ===== FOOTER PANELS ===== */
+  .footer {
+    display: grid;
+    grid-template-columns: 1.1fr 1.5fr 0.8fr;
+    gap: 0;
+    border-top: 2px solid var(--navy-800);
+  }
+  .panel {
+    padding: 24px 24px;
+    border-right: 1px solid var(--rule);
+  }
+  .panel:last-child { border-right: none; }
+  .panel h3 {
+    font-family: 'Fraunces', serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--navy-900);
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--gold);
+    letter-spacing: 0.02em;
+  }
+  .panel-group { margin-bottom: 16px; }
+  .panel-group:last-child { margin-bottom: 0; }
+  .panel-group .label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .panel-group.sov  .label { color: var(--green); }
+  .panel-group.hyb  .label { color: var(--amber); }
+  .panel-group.ext  .label { color: var(--navy-700); }
+  .panel-group ul {
+    list-style: none;
+    font-size: 12px;
+    color: var(--ink-soft);
+  }
+  .panel-group ul li {
+    padding: 2px 0 2px 14px;
+    position: relative;
+  }
+  .panel-group ul li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 10px;
+    width: 6px; height: 1px;
+    background: currentColor;
+    opacity: .4;
+  }
+
+  /* Flow diagram */
+  .flow {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+  }
+  .flow-step {
+    flex: 1;
+    min-width: 80px;
+    text-align: center;
+    padding: 10px 6px;
+    background: var(--navy-50);
+    border: 1px solid var(--rule);
+    font-size: 10.5px;
+    font-weight: 600;
+    color: var(--navy-900);
+    line-height: 1.3;
+  }
+  .flow-step .num {
+    display: block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--gold);
+    margin-bottom: 4px;
+    letter-spacing: 0.1em;
+  }
+  .flow-arrow {
+    color: var(--gold);
+    font-weight: 700;
+    font-size: 14px;
+  }
+
+  /* Legend */
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 0;
+    font-size: 12px;
+    border-bottom: 1px dashed var(--rule);
+  }
+  .legend-item:last-child { border-bottom: none; }
+  .legend-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .legend-dot.critical  { background: var(--critical); }
+  .legend-dot.very-high { background: var(--very-high); }
+  .legend-dot.high      { background: var(--high); }
+  .legend-dot.medium    { background: var(--medium); }
+
+  /* ===== OBJECTIVE BANNER ===== */
+  .objective {
+    background: var(--navy-900);
+    color: var(--gold);
+    padding: 18px 40px;
+    text-align: center;
+    font-family: 'Fraunces', serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    border-top: 1px solid var(--gold);
+  }
+  .objective::before {
+    content: '◆';
+    margin-right: 12px;
+    color: var(--gold);
+  }
+  .objective::after {
+    content: '◆';
+    margin-left: 12px;
+    color: var(--gold);
+  }
+
+  /* Document footer */
+  .doc-footer {
+    padding: 16px 40px;
+    background: #fafaf7;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-soft);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  @media (max-width: 768px) {
+    .footer { grid-template-columns: 1fr; }
+    .panel { border-right: none; border-bottom: 1px solid var(--rule); }
+    .header { padding: 24px 20px; }
+    .objective { padding: 16px 20px; font-size: 11px; }
+    .doc-footer { padding: 12px 20px; flex-direction: column; gap: 6px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="doc">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="eyebrow">Document de référence — Architecture souveraine</div>
+    <h1>Récapitulatif — Facturation Électronique Nationale</h1>
+    <p class="subtitle">Cartographie des composants critiques du système national de facturation électronique : périmètre souverain, modules externalisables et niveaux de criticité associés.</p>
+    <div class="meta">
+      <span>Version<strong>1.0</strong></span>
+      <span>Classification<strong>Stratégique</strong></span>
+      <span>Domaines<strong>25</strong></span>
+      <span>Modèle<strong>Hybride contrôlé</strong></span>
+    </div>
+  </header>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 16%;">Domaine</th>
+          <th style="width: 18%;">Ce qu'il faut</th>
+          <th style="width: 18%;">Souverain / Interne <span class="th-sub">À garder sous contrôle national</span></th>
+          <th style="width: 18%;">Externalisable <span class="th-sub">Possible avec partenaires</span></th>
+          <th style="width: 10%;">Niveau critique</th>
+          <th style="width: 20%;">Commentaires</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr class="section-row"><td colspan="6">I — Socle d'identité et de fiscalité</td></tr>
+
+        <tr>
+          <td class="domain"><span class="dom-num">01</span>Identité des entreprises</td>
+          <td class="requirement">Base NINEA / RCCM / identifiants uniques</td>
+          <td><span class="status yes"><span class="icon">✓</span>Oui</span></td>
+          <td><span class="status no"><span class="icon">✕</span>Non</span></td>
+          <td><span class="badge very-high">Très élevé</span></td>
+          <td class="comment">Données fondamentales pour l'identification fiscale et légale.</td>
+        </tr>
+        <tr>
+          <td class="domain"><span class="dom-num">02</span>Base fiscale</td>
+          <td class="requirement">Données fiscales, TVA, imposition</td>
+          <td><span class="status yes"><span class="icon">✓</span>Oui</span></td>
+          <td><span class="status no"><span class="icon">✕</span>Non</span></td>
+          <td><span class="badge critical">Critique</span></td>
+          <td class="comment">Cœur du système fiscal national.</td>
+        </tr>
+
+        <tr class="section-row"><td colspan="6">II — Plateformes et interfaces techniques</td></tr>
+
+        <tr>
+          <td class="domain"><span class="dom-num">03</span>Plateforme de facturation électronique</td>
+          <td class="requirement">Moteur central de validation et de traitement</td>
+          <td><span class="status yes"><span class="icon">✓</span>Oui (pilotage et règles fiscales)</span></td>
+          <td><span class="status warn"><span class="icon">!</span>Développement possible</span></td>
+          <td><span class="badge critical">Critique</span></td>
+          <td class="comment">La gouvernance et les règles fiscales doivent rester nationales.</td>
+        </tr>
+        <tr>
+          <td class="domain"><span class="dom-num">04</span>API nationales</td>
+          <td class="requirement">Communication sécurisée entre plateformes</td>
+          <td><span class="status yes"><span class="icon">✓</span>Architecture nationale</span></td>
+          <td><span class="status warn"><span class="icon">!</span>Développement possible</span></td>
+          <td><span class="badge very-high">Très élevé</span></td>
+          <td class="comment">Interfaces stratégiques entre systèmes publics et privés.</td>
+        </tr>
+
+        <tr class="section-row"><td colspan="6">III — Cryptographie et confiance numérique</td></tr>
+
+        <tr>
+          <td class="domain"><span class="dom-num">05</span>PKI nationale</td>
+          <td class="requirement">Signature électronique, certificats numériques</td>
+          <td><span class="status yes"><span class="icon">✓</span>Oui</span></td>
+          <td><span class="status no"><span class="icon">✕</span>Non</span></td>
+          <td><span class="badge critical">Critique</span></td>
+          <td class="comment">Indispensable pour l'authentification et la non-répudiation.</td>
+        </tr>
+        <tr>
+          <td class="domain"><span class="dom-num">06</span>Clés cryptographiques</td>
+          <td class="requirement">Clés maîtresses de chiffrement et signature</td>
+          <td><span class="status yes"><span class="icon">✓</span>Oui (génération et stockage HSM)</span></td>
+          <td><span class="status no"><span class="icon">✕</span>Non</span></td>
+          <td><span class="badge critical">Critique</span></td>
+          <td class="comment">Les clés maîtresses doivent rester sous contrôle national exclusif.</td>
+        </tr>
+        <tr>
+          <td class="domain"><span class="dom-num">07</span>QR code fiscal</td>
+          <td class="requirement">Vérification et authentification des factures</td>
+          <td><span class="status yes"><span class="icon">✓</span>Oui</span></td>
+          <td><span class="status warn"><span class="icon">!</span>Implémentation possible</span></td>
+          <td><span class="badge high">Élevé</span></td>
+          <td class="comment">Facilite le contrôle et la transparence.</td>
+        </tr>
+
+        <tr class="section-row"><td colspan="6">IV — Infrastructure et continuité</td></tr>
+
+        <tr>
+          <td class="domain"><span class="dom-num">08</span>Datacenter principal</td>
+          <td class="requirement">Hébergement des plateformes et données</td>
+          <td><span class="status yes"><span class="icon">✓</span>Contrôle État</span></td>
+          <td><span class="status warn"><span class="icon">!</span>Exploitation possible</span></td>
+          <td><span class="badge very-high">Très élevé</span></td>
+          <td class="comment">Les données critiques doivent rester dans des infrastructures maîtrisées.</td>
+        </tr>
+        <tr>
+          <td class="domain"><span class="dom-num">09</span>Site de secours (DR)</td>
+          <td class="requirement">Continuité d'activité (Disaster Recovery)</td>
+          <td><span class="status yes"><span class="icon">✓</span>Oui</span></td>
+          <td><span class="status warn"><span class="icon">!</span>Exploitation possible</span></td>
+          <td><span class="badge very-high">Très élevé</span></td>
+          <td class="comment">Indispensable pour assurer la résilience nationale.</td>
+        </tr>
+        <tr>
+          <td class="domain"><span class="dom-num">10</span>Réseau gouvernemental sécurisé</td>
+          <td class="requirement">Interconnexion administrations (MPLS, VPN)</td>
+          <td><span class="status warn"><span class="icon">!</span>Contrôle et gouvernance</span></td>
+          <td><span class="status yes"><span class="icon">✓</span>Oui (opérateurs)</span></td>
+          <td><span class="badge very-high">Très élevé</span></td>
+          <td class="comment">Relie toutes les administrations et partenaires de manière sécurisée.</td>
+        </tr>
+        <tr>
+          <td class="domain"><span class="dom-num">11</span>Cloud souverain</td>
+          <td class="requirement">Hébergement hybride sécurisé</td>
+          <td><span class="status yes"><span class="icon">✓</span>Gouvernance et données critiques</span></td>
+          <td><span class="status warn"><span class="icon">!</span>Infrastructure possible</span></td>
+          <td><span class="badge very-high">Très élevé</span></td>
+          <td class="comment">Le cloud peut être utilisé si les données restent sous contrôle national.</td>
+        </tr>
+
+        <tr class="section-row"><td colspan="6">V — Développement applicatif</td></tr>
+
+        <tr>
+          <td class="domain"><span class="dom-num">12</span>Développement backend</td>
+          <td class="requirement">Logique métier, moteur fiscal, services, intégrations</td>
+          <td><span class="status warn"><span class="icon">!</span>Propriété État (code et règles)</span></td>
+          <td><span class="status yes"><span class="icon">✓</span>Développement possible</span></td>
+          <td><span class="badge critical">Critique</span></td>
+          <td class="comment">Le code source et les règles doivent appartenir à l'État.</td>
+        </tr>
+        <tr>
+          <td class="domain"><span class="dom-num">13</span>Frontend / Portails</td>
+          <td class="requirement">Interfaces web entreprises, admin, DGID</td>
+          <td><span class="status no"><span class="icon">✕</span>Pas critique à garder en interne</span></td>
+          <td><span class="status yes"><span class="icon">✓</span>Oui</span></td>
+          <td><span class="badge high">Élevé</span></td>
+          <td class="comment">Vecteur d'attaque sensible — audits réguliers requis.</td>
+        </tr>
+        <tr>
+          <td class="domain"><span class="dom-num">14</span>Applications mobiles</td>
+          <td class="requirement">Apps entreprises, agents, contrôleurs</td>
+          <td><span class="status no"><span class="icon">✕</span>Pas critique à garder en interne</span></td>
+          <td><span class="status yes"><span class="icon">✓</span>Oui</span></td>
+          <td><span class="badge high">Élevé</span></td>
+          <td class="comment">Facilite l'usage et le contrôle terrain — sécurisation indispensable.</td>
+        </tr>
+
+        <tr class="section-row"><td colspan="6">VI — Cybersécurité et supervision</td></tr>
+
+        <tr>
+          <td class="domain"><span class="dom-num">15</span>Cybersécurité (SOC)</td>
+          <td class="requirement">Surveillance, détection, réponse aux incidents</td>
+          <td><span class="status yes"><span class="icon">✓</span>Oui (SOC national)</span></td>
+          <td><span class="status warn"><span class="icon">!</span>Assistance possible</span></td>
+          <td><span class="badge critical">Critique</span></td>
+          <td class="comment">Un SOC national assure la sécurité 24/7.</td>
+        </tr>
+        <tr>
+          <td class="domain"><span class="dom-num">16</span>Pare-feux / Équipements réseau</td>
+          <td class="requirement">Protection périmétrique et sécurité réseau</td>
+          <td><span class="status warn"><span class="icon">!</span>Contrôle et politiques</span></td>
+          <td><span class="status yes"><span class="icon">✓</span>Fournisseurs possibles</span></td>
+          <td><span class="badge very-high">Très élevé</span></td>
+          <td class="comment">Les politiques et la configuration restent sous contrôle national.</td>
+        </tr>
+        <tr>
+          <td class="domain"><span class="dom-num">17</span>Monitoring & Logs</td>
+          <td class="requirement">Supervision, logs, métriques</td>
+          <td><span class="status warn"><span class="icon">!</span>Données et gouvernance</span></td>
+          <td><span class="status yes"><span class="icon">✓</span>Solutions possibles</span></td>
+          <td><span class="badge high">Élevé</span></td>
+          <td class="comment">Permet la disponibilité et la traçabilité.</td>
+        </tr>
+
+        <tr class="section-row"><td colspan="6">VII — Sauvegarde, archivage et intelligence</td></tr>
+
+        <tr>
+          <td class="domain"><span class="dom-num">18</span>Sauvegardes nationales</td>
+          <td class="requirement">Backups fréquents et hors site</td>
+          <td><span class="status yes"><span class="icon">✓</span>Oui</span></td>
+          <td><span class="status warn"><span class="icon">!</span>Exploitation possible</span></td>
+          <td><span class="badge critical">Critique</span></td>
+          <td class="comment">Garantit la restauration des données critiques en cas de sinistre.</td>
+        </tr>
+        <tr>
+          <td class="domain"><span class="dom-num">19</span>Archivage légal</td>
+          <td class="requirement">Conservation légale des factures</td>
+          <td><span class="status yes"><span class="icon">✓</span>Oui</span></td>
+          <td><span class="status warn"><span class="icon">!</span>Hébergement possible</span></td>
+          <td><span class="badge very-high">Très élevé</span></td>
+          <td class="comment">Durées légales et intégrité garanties.</td>
+        </tr>
+        <tr>
+          <td class="domain"><span class="dom-num">20</span>IA antifraude</td>
+          <td class="requirement">Détection anomalies fiscales et fraude</td>
+          <td><span class="status warn"><span class="icon">!</span>Données et décisions finales</span></td>
+          <td><span class="status yes"><span class="icon">✓</span>Développement possible</span></td>
+          <td><span class="badge high">Élevé</span></td>
+          <td class="comment">Outil d'aide à la décision — décision finale nationale.</td>
+        </tr>
+
+        <tr class="section-row"><td colspan="6">VIII — Support, formation et gouvernance</td></tr>
+
+        <tr>
+          <td class="domain"><span class="dom-num">21</span>Support technique</td>
+          <td class="requirement">Assistance utilisateurs et helpdesk</td>
+          <td><span class="status no"><span class="icon">✕</span>Pas critique à garder en interne</span></td>
+          <td><span class="status yes"><span class="icon">✓</span>Oui</span></td>
+          <td><span class="badge medium">Moyen</span></td>
+          <td class="comment">Améliore l'expérience utilisateur.</td>
+        </tr>
+        <tr>
+          <td class="domain"><span class="dom-num">22</span>Formation & Transfert</td>
+          <td class="requirement">Montée en compétences équipes nationales</td>
+          <td><span class="status no"><span class="icon">✕</span>Pas critique à garder en interne</span></td>
+          <td><span class="status yes"><span class="icon">✓</span>Oui</span></td>
+          <td><span class="badge high">Élevé</span></td>
+          <td class="comment">Essentiel pour l'autonomie et la pérennité du système.</td>
+        </tr>
+        <tr>
+          <td class="domain"><span class="dom-num">23</span>Audit sécurité</td>
+          <td class="requirement">Audits, tests d'intrusion, conformité</td>
+          <td><span class="status warn"><span class="icon">!</span>Supervision État</span></td>
+          <td><span class="status yes"><span class="icon">✓</span>Oui (auditeurs indépendants)</span></td>
+          <td><span class="badge very-high">Très élevé</span></td>
+          <td class="comment">Assure la conformité et réduit les risques.</td>
+        </tr>
+        <tr>
+          <td class="domain"><span class="dom-num">24</span>Gouvernance architecture</td>
+          <td class="requirement">Standards, référentiels, interopérabilité</td>
+          <td><span class="status yes"><span class="icon">✓</span>Oui</span></td>
+          <td><span class="status no"><span class="icon">✕</span>Non</span></td>
+          <td><span class="badge critical">Critique</span></td>
+          <td class="comment">Décide des standards et de l'alignement national.</td>
+        </tr>
+        <tr>
+          <td class="domain"><span class="dom-num">25</span>Code source stratégique</td>
+          <td class="requirement">Propriété intellectuelle de la plateforme</td>
+          <td><span class="status yes"><span class="icon">✓</span>Oui (appartient à l'État)</span></td>
+          <td><span class="status warn"><span class="icon">!</span>Développement possible — propriété État</span></td>
+          <td><span class="badge critical">Critique</span></td>
+          <td class="comment">L'État doit détenir les droits de propriété.</td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+
+  <!-- FOOTER PANELS -->
+  <div class="footer">
+
+    <!-- Répartition idéale -->
+    <div class="panel">
+      <h3>Répartition idéale</h3>
+      <div class="panel-group sov">
+        <div class="label">100% Souverain / Interne</div>
+        <ul>
+          <li>Identité nationale</li>
+          <li>Données fiscales</li>
+          <li>PKI et clés cryptographiques</li>
+          <li>Règles fiscales et validations</li>
+          <li>Architecture et gouvernance</li>
+          <li>SOC national</li>
+        </ul>
+      </div>
+      <div class="panel-group hyb">
+        <div class="label">Modèle hybride (contrôlé)</div>
+        <ul>
+          <li>Développement logiciel</li>
+          <li>Cloud et datacenter</li>
+          <li>Réseau et connectivité</li>
+          <li>APIs et intégrations</li>
+          <li>Monitoring et sécurité</li>
+        </ul>
+      </div>
+      <div class="panel-group ext">
+        <div class="label">Externalisable plus facilement</div>
+        <ul>
+          <li>Portails / Frontend / Mobile</li>
+          <li>Support et helpdesk</li>
+          <li>Formation</li>
+          <li>Maintenance non critique</li>
+          <li>UI/UX et design</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Flux simplifié -->
+    <div class="panel">
+      <h3>Flux simplifié de la facturation électronique</h3>
+      <div class="flow">
+        <div class="flow-step"><span class="num">01</span>Entreprise émettrice</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><span class="num">02</span>Logiciel de facturation</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><span class="num">03</span>API DGID</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><span class="num">04</span>Validation fiscale (Visa)</div>
+      </div>
+      <div class="flow" style="margin-top: 8px;">
+        <div class="flow-step"><span class="num">05</span>Facture certifiée (QR)</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><span class="num">06</span>Client destinataire</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step"><span class="num">07</span>Archivage national</div>
+      </div>
+      <div style="margin-top: 16px; font-size: 11px; color: var(--ink-soft); font-style: italic; line-height: 1.5;">
+        Chaque étape du flux est associée à un ou plusieurs domaines du tableau ci-dessus, garantissant traçabilité, intégrité et non-répudiation.
+      </div>
+    </div>
+
+    <!-- Légende -->
+    <div class="panel">
+      <h3>Niveau critique</h3>
+      <div class="legend-item">
+        <span class="legend-dot critical"></span>
+        <span><strong>Critique</strong> — Impact systémique</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot very-high"></span>
+        <span><strong>Très élevé</strong> — Risque majeur</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot high"></span>
+        <span><strong>Élevé</strong> — Vigilance requise</span>
+      </div>
+      <div class="legend-item">
+        <span class="legend-dot medium"></span>
+        <span><strong>Moyen</strong> — Risque maîtrisable</span>
+      </div>
+
+      <h3 style="margin-top: 24px;">Symboles</h3>
+      <div class="legend-item">
+        <span class="status yes"><span class="icon">✓</span></span>
+        <span>Recommandé / Maîtrisé</span>
+      </div>
+      <div class="legend-item">
+        <span class="status warn"><span class="icon">!</span></span>
+        <span>Conditionnel / Sous contrôle</span>
+      </div>
+      <div class="legend-item">
+        <span class="status no"><span class="icon">✕</span></span>
+        <span>Non recommandé</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Objective -->
+  <div class="objective">
+    Souveraineté numérique · Sécurité · Interopérabilité · Performance — pour une facturation électronique fiable et durable
+  </div>
+
+  <!-- Doc footer -->
+  <div class="doc-footer">
+    <span>Document de référence — Architecture souveraine</span>
+    <span>Confidentiel · Usage institutionnel</span>
+  </div>
+
+</div>
+
+</body>
+</html>
